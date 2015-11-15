@@ -47,7 +47,7 @@ class RemoteProcessClient:
 
     def write_protocol_version_message(self):
         self.write_enum(RemoteProcessClient.MessageType.PROTOCOL_VERSION)
-        self.write_int(1)
+        self.write_int(2)
 
     def read_game_context_message(self):
         message_type = self.read_enum(RemoteProcessClient.MessageType)
@@ -128,7 +128,7 @@ class RemoteProcessClient:
             self.read_long(), self.read_int(), self.read_boolean(), self.read_enum(CarType), self.read_int(),
             self.read_int(), self.read_int(), self.read_int(), self.read_int(), self.read_int(), self.read_int(),
             self.read_int(), self.read_double(), self.read_double(), self.read_double(), self.read_int(),
-            self.read_int(), self.read_boolean()
+            self.read_int(), self.read_int(), self.read_boolean()
         )
 
     def write_car(self, car):
@@ -162,6 +162,7 @@ class RemoteProcessClient:
             self.write_double(car.durability)
             self.write_double(car.engine_power)
             self.write_double(car.wheel_turn)
+            self.write_int(car.next_waypoint_index)
             self.write_int(car.next_waypoint_x)
             self.write_int(car.next_waypoint_y)
             self.write_boolean(car.finished_track)
@@ -567,8 +568,10 @@ class RemoteProcessClient:
         return self.map_name
 
     def read_tiles_x_y(self):
-        if self.tiles_x_y is None:
-            self.tiles_x_y = self.read_enums_2d(TileType)
+        new_tiles_x_y = self.read_enums_2d(TileType)
+
+        if new_tiles_x_y is not None and new_tiles_x_y.__len__() > 0:
+            self.tiles_x_y = new_tiles_x_y
 
         return self.tiles_x_y
 
